@@ -312,6 +312,7 @@ describe("Deploy simple vault and test its fucntionalities and make sure it work
   //make sure   contracts are gas efficient and low in gas this is big priority we must master thhis gas is trickky in solidity
 
   try {
+    //you can fine tune testing this vault and the actions in the test everything from my end works flwlessly
     const vaultToken = await viem.deployContract("VaultToken", [
       "Vault Token",
       "VToken",
@@ -323,13 +324,13 @@ describe("Deploy simple vault and test its fucntionalities and make sure it work
     const tokenEvents = publicClient.watchContractEvent({
       address: vaultToken.address,
       abi: vaultToken.abi,
-      onLogs: (logs) => console.log(logs),
+      onLogs: (logs) => console.log(logs[0].eventName, logs[0].args),
     });
 
     const vaultEvents = publicClient.watchContractEvent({
       address: vaultToken.address,
       abi: vaultToken.abi,
-      onLogs: (logs) => console.log(logs),
+      onLogs: (logs) => console.log(logs[0].eventName, logs[0].args),
     });
 
     // //the error   from modifier shhows properly revert works
@@ -372,8 +373,41 @@ describe("Deploy simple vault and test its fucntionalities and make sure it work
       args: [walletClient.account.address],
     });
 
-    console.log("Your vault Balance: ", vaultBalance);
+    console.log("Your vault Balance after deposit : ", vaultBalance);
     ///////////////////////////////////////////////////
+    //try a withdraw all
+
+    await vault.simulate._withdrawAll();
+
+    const withdrawAllHash = await vault.write._withdrawAll();
+
+    const withdrawAllReciept = await publicClient.waitForTransactionReceipt({
+      hash: withdrawAllHash,
+    });
+
+    //withdraw from vault works flawlessly event reverts are working flawlessly
+
+    // await vault.simulate._withdraw([50000n]);
+
+    // const withdrawHash = await vault.write._withdraw([50000n]);
+
+    // const withdrawReciept = await publicClient.waitForTransactionReceipt({
+    //   hash: withdrawHash,
+    // });
+
+    //gets updated balance from vault
+    const vaultBalanceAfterWithdraw = await publicClient.readContract({
+      address: vault.address,
+      abi: vault.abi,
+      functionName: "_getVaultBalance",
+      args: [walletClient.account.address],
+    });
+    console.log(
+      "Your vault Balance after withdraw: ",
+      vaultBalanceAfterWithdraw
+    );
+
+    //////////////////////////////////////////////////////////////////////
   } catch (error) {
     console.log(error);
   }

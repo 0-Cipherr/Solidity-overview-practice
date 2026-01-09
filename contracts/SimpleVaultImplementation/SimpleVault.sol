@@ -28,6 +28,10 @@ contract SimpleVault {
         //get balance of using the deployed contracts interface
         uint256 __userBalance = _asset.balanceOf(msg.sender);
         require(
+            __userBalance > 0,
+            "No Assets deposited in vault must deposit before withdawing!"
+        );
+        require(
             _amount <= __userBalance,
             "Not enough tokens to deposit into vault!"
         );
@@ -77,7 +81,7 @@ contract SimpleVault {
     //if they dont error is thrown and transaction reverts
     function _deposit(
         uint256 _amount
-    ) external HasDepositAmount(_amount) IsApproved(_amount) {
+    ) public HasDepositAmount(_amount) IsApproved(_amount) {
         //transfer from user to contact wallet mmust be approved to spend first by this contract before doing deposit  or tx reverts from   modifier
         _asset.transferFrom(msg.sender, _vaultAddress, _amount);
         //update vault balance for address calling
@@ -90,12 +94,12 @@ contract SimpleVault {
 
     //withdraw from vault uses HaveWithdrawlAmount
     //ensures users dont withdrawl more than they have deposited or esle transaction will revert
-    function _withdraw(uint256 _amount) external HaveWithdrawAmount(_amount) {
+    function _withdraw(uint256 _amount) public HaveWithdrawAmount(_amount) {
         //do this before to prevent hacks and exploits prevent rentrancy
         _vaultBalance[msg.sender] -= _amount;
         _tvl -= _amount;
         //transfer to wallet withdrawing if they have that amount or greater deposited
-        _asset.transferFrom(_vaultAddress, msg.sender, _amount);
+        _asset.transfer(msg.sender, _amount);
 
         emit AssetWithdrawn(_amount, block.timestamp);
     }
@@ -103,14 +107,14 @@ contract SimpleVault {
     //withdraw all tokens user deposited into vault
     // uses the HasUserDeposited to make sure user has actually deposited into vault
     //if modifier  doesnt have param passed in u dont need the parenthesis
-    function _withdrawAll() external HasUserDeposited {
+    function _withdrawAll() public HasUserDeposited {
         //store temporarilt current deposited aount before updating vault balances
         uint256 _amountDeposited = _vaultBalance[msg.sender];
         //prevents rentrancy
         _vaultBalance[msg.sender] = 0;
         _tvl -= _amountDeposited;
         //withdraw all tokens
-        _asset.transferFrom(_vaultAddress, msg.sender, _amountDeposited);
+        _asset.transfer(msg.sender, _amountDeposited);
         //emits event asseets was withdrawn
         emit AssetWithdrawn(_amountDeposited, block.timestamp);
     }

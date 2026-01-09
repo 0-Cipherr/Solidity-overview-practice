@@ -16,9 +16,16 @@ interface IERC20Asset {
         uint256 value
     ) external virtual returns (bool);
 
+    //we use this to process user to contract transfers
+    //of course users need to approve spedning before interacting with my contract so its best we use this function
+    //we use since this transfer function needs approval
     function transferFrom(
         address from,
         address to,
         uint256 value
     ) external virtual returns (bool);
+
+    //we dot need no approval for sending tokens from vault to user because the contract itself is doing
+    //contract to user so we use this no approval needed
+    function transfer(address to, uint256 value) external returns (bool);
 }
