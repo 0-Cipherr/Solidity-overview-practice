@@ -1,0 +1,78 @@
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "[python]": {
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    },
+    "editor.formatOnSave": "charliermarsh.ruff"
+  },
+  "database-client.autoSync": true,
+  "animations.Install-Method": "Apc Customize UI++",
+  "apc.electron": {
+    "opacity": 0.95,
+    "transparent": true,
+    "backgroundColor": "#00000000",
+    "vibrancy": "ultra-dark"
+  },
+  "move-analyzer.serverPath": "sui",
+  "move-analyzer.diagnostics": true,
+  "files.associations": {
+    "*.move": "move"
+  },
+  "glassit.alpha": 240,
+  "editor.cursorBlinking": "phase",
+  "editor.cursorSmoothCaretAnimation": "on",
+  "editor.inlineSuggest.enabled": false,
+  "[move]": {},
+  "editor.inlineSuggest.edits.allowCodeShifting": "never",
+  "solidity.telemetry": true,
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "workbench.iconTheme": "file-icons",
+
+  "editor.fontFamily": "'3720 Nerd Font Mono', monospace",
+  "editor.fontLigatures": false,
+  "editor.fontWeight": "300",
+  "editor.fontSize": 13,
+  "editor.lineHeight": 1.2,
+  "editor.letterSpacing": 0,
+  "editor.smoothScrolling": false,
+  "workbench.fontAliasing": "none",
+  "window.zoomLevel": 0,
+  "terminal.integrated.fontFamily": "'3720 Nerd Font Mono', monospace",
+  "terminal.integrated.fontWeight": "400",
+  "terminal.integrated.letterSpacing": 0,
+  "terminal.integrated.lineHeight": 1.2,
+
+  "javascript.preferences.organizeImports": {},
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit"
+  },
+  "editor.minimap.enabled": false,
+  "chat.instructionsFilesLocations": {
+    ".github/instructions": true,
+    "/tmp/postman-collections-post-response.instructions.md": true,
+    "/tmp/postman-collections-pre-request.instructions.md": true,
+    "/tmp/postman-folder-post-response.instructions.md": true,
+    "/tmp/postman-folder-pre-request.instructions.md": true,
+    "/tmp/postman-http-request-post-response.instructions.md": true,
+    "/tmp/postman-http-request-pre-request.instructions.md": true
+  },
+  "terminal.integrated.env.linux": {},
+  "console-ninja.featureSet": "Community",
+  "workbench.colorTheme": "Cursor Dark",
+  "workbench.activityBar.location": "top",
+  "window.menuBarVisibility": "toggle",
+  "window.commandCenter": false,
+  "chat.commandCenter.enabled": false,
+  "workbench.editor.showTabs": "multiple",
+  "workbench.editor.enablePreviewFromCodeNavigation": true,
+  "editor.rename.enablePreview": false,
+  "workbench.secondarySideBar.defaultVisibility": "hidden",
+  "[solidity]": {
+    "editor.defaultFormatter": "NomicFoundation.hardhat-solidity"
+  },
+  "workbench.statusBar.visible": false
+}
+
