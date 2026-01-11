@@ -1,5 +1,6 @@
 import { network } from "hardhat";
 import { describe } from "node:test";
+
 //eth sepolia has 0.5
 const privatekey =
   "a83d708fc7df292f4242faa492fe9ba102628341b4c37e4c7dfbde00010538a5";
@@ -300,114 +301,234 @@ const privatekey =
 //   }
 // });
 
-describe("Deploy simple vault and test its fucntionalities and make sure it works flawlessly low gas and efficiently", async function () {
-  const { viem } = await network.connect("hardhatMainnet");
-  const publicClient = await viem.getPublicClient();
-  const [walletClient] = await viem.getWalletClients();
+// describe("Deploy simple vault and test its fucntionalities and make sure it works flawlessly low gas and efficiently", async function () {
+//   const { viem } = await network.connect("hardhatMainnet");
+//   const publicClient = await viem.getPublicClient();
+//   const [walletClient] = await viem.getWalletClients();
 
-  //deploy vault token
+//   //deploy vault token
 
-  //test starts   do everthing step by step do first fails to make sure system works and blocks malicious entities
-  //tm we finnish this
-  //make sure   contracts are gas efficient and low in gas this is big priority we must master thhis gas is trickky in solidity
+//   //test starts   do everthing step by step do first fails to make sure system works and blocks malicious entities
+//   //tm we finnish this
+//   //make sure   contracts are gas efficient and low in gas this is big priority we must master thhis gas is trickky in solidity
 
+//   try {
+//     //you can fine tune testing this vault and the actions in the test everything from my end works flwlessly
+//     const vaultToken = await viem.deployContract("VaultToken", [
+//       "Vault Token",
+//       "VToken",
+//     ]);
+//     //deploy ault passing in vault token address
+//     const vault = await viem.deployContract("SimpleVault", [
+//       vaultToken.address,
+//     ]);
+//     const tokenEvents = publicClient.watchContractEvent({
+//       address: vaultToken.address,
+//       abi: vaultToken.abi,
+//       onLogs: (logs) => console.log(logs[0].eventName, logs[0].args),
+//     });
+
+//     const vaultEvents = publicClient.watchContractEvent({
+//       address: vaultToken.address,
+//       abi: vaultToken.abi,
+//       onLogs: (logs) => console.log(logs[0].eventName, logs[0].args),
+//     });
+
+//     // //the error   from modifier shhows properly revert works
+//     // await vault.simulate._deposit([[300000n]]);
+
+//     // //test the deposit
+//     // const depositHash = await vault.write._deposit([[300000n]]);
+
+//     // const receipt = await publicClient.waitForTransactionReceipt({
+//     //   hash: depositHash,
+//     // });
+
+//     //simualte and test a deposit properly WORKS PROPERLY
+//     await vaultToken.simulate.approve([vault.address, 500000n]);
+
+//     //test the deposit approve spending
+//     const approveHash = await vaultToken.write.approve([
+//       vault.address,
+//       500000n,
+//     ]);
+
+//     const approveReciept = await publicClient.waitForTransactionReceipt({
+//       hash: approveHash,
+//     });
+
+//     //deposit
+//     await vault.simulate._deposit([300000n]);
+
+//     //test the deposit
+//     const depositHash = await vault.write._deposit([300000n]);
+
+//     const depositReciept = await publicClient.waitForTransactionReceipt({
+//       hash: depositHash,
+//     });
+
+//     const vaultBalance = await publicClient.readContract({
+//       address: vault.address,
+//       abi: vault.abi,
+//       functionName: "_getVaultBalance",
+//       args: [walletClient.account.address],
+//     });
+
+//     console.log("Your vault Balance after deposit : ", vaultBalance);
+//     ///////////////////////////////////////////////////
+//     //try a withdraw all
+
+//     await vault.simulate._withdrawAll();
+
+//     const withdrawAllHash = await vault.write._withdrawAll();
+
+//     const withdrawAllReciept = await publicClient.waitForTransactionReceipt({
+//       hash: withdrawAllHash,
+//     });
+
+//     //withdraw from vault works flawlessly event reverts are working flawlessly
+
+//     // await vault.simulate._withdraw([50000n]);
+
+//     // const withdrawHash = await vault.write._withdraw([50000n]);
+
+//     // const withdrawReciept = await publicClient.waitForTransactionReceipt({
+//     //   hash: withdrawHash,
+//     // });
+
+//     //gets updated balance from vault
+//     const vaultBalanceAfterWithdraw = await publicClient.readContract({
+//       address: vault.address,
+//       abi: vault.abi,
+//       functionName: "_getVaultBalance",
+//       args: [walletClient.account.address],
+//     });
+//     console.log(
+//       "Your vault Balance after withdraw: ",
+//       vaultBalanceAfterWithdraw
+//     );
+
+//     //////////////////////////////////////////////////////////////////////
+//   } catch (error) {
+//     console.log(error);
+//   }
+// });
+
+// gonna mint a shit ton of tokens from my dev walet and send to vault and users to test properly and prevent errors when withdrawing sounds right
+
+describe("Vaults work properly and distribute good amount to users", async function () {
   try {
-    //you can fine tune testing this vault and the actions in the test everything from my end works flwlessly
-    const vaultToken = await viem.deployContract("VaultToken", [
-      "Vault Token",
+    const { viem } = await network.connect();
+    const publicCLient = await viem.getPublicClient();
+    const [walletClient] = await viem.getWalletClients();
+
+    //initial supply 50000 tokens
+    const AToken = await viem.deployContract("AToken", [
+      "AToken",
+      "AToken",
+      50000n,
+    ]);
+
+    const vault = await viem.deployContract("ERC4626Vault", [
+      AToken.address,
+      "VToken",
       "VToken",
     ]);
-    //deploy ault passing in vault token address
-    const vault = await viem.deployContract("SimpleVault", [
-      vaultToken.address,
-    ]);
-    const tokenEvents = publicClient.watchContractEvent({
-      address: vaultToken.address,
-      abi: vaultToken.abi,
-      onLogs: (logs) => console.log(logs[0].eventName, logs[0].args),
+
+    const ATOkeneventsWatcher = publicCLient.watchContractEvent({
+      address: AToken.address,
+      abi: AToken.abi,
+      onLogs: (logs: any) => console.log(logs[0].eventName, logs[0].args),
     });
 
-    const vaultEvents = publicClient.watchContractEvent({
-      address: vaultToken.address,
-      abi: vaultToken.abi,
-      onLogs: (logs) => console.log(logs[0].eventName, logs[0].args),
-    });
-
-    // //the error   from modifier shhows properly revert works
-    // await vault.simulate._deposit([[300000n]]);
-
-    // //test the deposit
-    // const depositHash = await vault.write._deposit([[300000n]]);
-
-    // const receipt = await publicClient.waitForTransactionReceipt({
-    //   hash: depositHash,
-    // });
-
-    //simualte and test a deposit properly WORKS PROPERLY
-    await vaultToken.simulate.approve([vault.address, 500000n]);
-
-    //test the deposit approve spending
-    const approveHash = await vaultToken.write.approve([
-      vault.address,
-      500000n,
-    ]);
-
-    const approveReciept = await publicClient.waitForTransactionReceipt({
-      hash: approveHash,
-    });
-
-    //deposit
-    await vault.simulate._deposit([300000n]);
-
-    //test the deposit
-    const depositHash = await vault.write._deposit([300000n]);
-
-    const depositReciept = await publicClient.waitForTransactionReceipt({
-      hash: depositHash,
-    });
-
-    const vaultBalance = await publicClient.readContract({
+    const VaulteventsWatcher = publicCLient.watchContractEvent({
       address: vault.address,
       abi: vault.abi,
-      functionName: "_getVaultBalance",
-      args: [walletClient.account.address],
+      onLogs: (logs: any) => console.log(logs[0].eventName, logs[0].args),
     });
 
-    console.log("Your vault Balance after deposit : ", vaultBalance);
-    ///////////////////////////////////////////////////
-    //try a withdraw all
+    //
+
+    await AToken.simulate.approve([walletClient.account.address, 1000000n]);
+
+    const walletApproveHash = await AToken.write.approve([
+      walletClient.account.address,
+      1000000n,
+    ]);
+
+    const approvwalletApproveReciepteReciept =
+      await publicCLient.waitForTransactionReceipt({
+        hash: walletApproveHash,
+      });
+    ///
+
+    await AToken.simulate.approve([vault.address, 1000000n]);
+
+    const approveHash = await AToken.write.approve([vault.address, 1000000n]);
+
+    const approveReciept = await publicCLient.waitForTransactionReceipt({
+      hash: approveHash,
+    });
+    //finish rest of test
+    //transfer tokens to vault to prevent errors when withdrawing vault not having enough tokens after yield acurred
+    const transferParams: any = [[vault.address], [40000n]];
+    await AToken.simulate._batchTransfer(transferParams);
+
+    const transferHash = await AToken.write._batchTransfer(transferParams);
+
+    const transferReciept = await publicCLient.waitForTransactionReceipt({
+      hash: transferHash,
+    });
+
+    /////////////////////////////////////////////////////////
+    //deposit into vault some tokens leave some for me test multiple deposits
+    //simulate deposits
+    //must simulate deposits on each depsit wait a specific time to see if yield updates based on blocks passed (time passed)
+    console.log(
+      "Allowance:",
+      await publicCLient.readContract({
+        address: AToken.address,
+        abi: AToken.abi,
+        functionName: "allowance",
+        args: [walletClient.account.address, vault.address],
+      })
+    );
+    const vaultDepositParams = [2000n];
+    await vault.simulate._depositAssets([2000n]);
+
+    const depositHash = await vault.write._depositAssets([2000n]);
+
+    const depositReciept = await publicCLient.waitForTransactionReceipt({
+      hash: depositHash,
+    });
+    //simulate one year has passed
+
+    await (publicCLient.request as any)({
+      method: "hardhat_mine",
+      params: ["0x282E50"],
+    });
+
+    const vaultDepositParamsv2 = [2000n];
+    await vault.simulate._depositAssets([2000n]);
+
+    const depositHashv2 = await vault.write._depositAssets([2000n]);
+
+    const depositRecieptv2 = await publicCLient.waitForTransactionReceipt({
+      hash: depositHashv2,
+    });
+
+    //simulate withdraw after 1 year update
 
     await vault.simulate._withdrawAll();
 
-    const withdrawAllHash = await vault.write._withdrawAll();
+    const withdrawHash = await vault.write._withdrawAll();
 
-    const withdrawAllReciept = await publicClient.waitForTransactionReceipt({
-      hash: withdrawAllHash,
+    const withdrawReciept = await publicCLient.waitForTransactionReceipt({
+      hash: withdrawHash,
     });
 
-    //withdraw from vault works flawlessly event reverts are working flawlessly
-
-    // await vault.simulate._withdraw([50000n]);
-
-    // const withdrawHash = await vault.write._withdraw([50000n]);
-
-    // const withdrawReciept = await publicClient.waitForTransactionReceipt({
-    //   hash: withdrawHash,
-    // });
-
-    //gets updated balance from vault
-    const vaultBalanceAfterWithdraw = await publicClient.readContract({
-      address: vault.address,
-      abi: vault.abi,
-      functionName: "_getVaultBalance",
-      args: [walletClient.account.address],
-    });
-    console.log(
-      "Your vault Balance after withdraw: ",
-      vaultBalanceAfterWithdraw
-    );
-
-    //////////////////////////////////////////////////////////////////////
+    //theres a bug in withdraw not enough balance when we indeed have a balance fix niggalock in fix tm
+    //fiinish the rest of the sophisticated test tm possibly
   } catch (error) {
     console.log(error);
   }
