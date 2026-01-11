@@ -4,6 +4,8 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC4626.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
+//note:params passed incorectly use safe math r math reqrite entire thing find bugs and ifx properly no help at all aican only give cluse  test is set up right
+
 //this just goes over the concept of updating yield block bsed as oposed to using a bot on the fronted
 //to me this is a easier approach
 //in our real project we track alot of stuff in structs so we can update yield for each deposit properly and accuratley
@@ -129,6 +131,8 @@ contract ERC4626Vault is ERC4626 {
 
     //witthdra
     function _withdrawAll() public _hasDepositBalance {
+        //update yield check if blocks have passed (time has passed since last update)
+        _updateYield();
         //shares balances of users wallet
         //we are gonna check shares wallet baalnce instead of shares deposited because that means
         //if i use shares dposited and they transferred out tokens and have less im giving more money
@@ -158,15 +162,13 @@ contract ERC4626Vault is ERC4626 {
         _totalShares -= _sharesWalletBalance;
         _totalAssets -= _amountToWithdraw;
 
-        //update yield check if blocks have passed (time has passed since last update)
-        _updateYield();
-
         emit _assetsWithdrawn(_amountToWithdraw, block.timestamp);
     }
 
-    function _getDepositBalance() public returns (uint256) {
+    //thhis is a write
+    function getDepositBalance(address _account) public returns (uint256) {
         //even though mappings has  fucntion made this to update yield on each check for vault
-        _updateYield();
-        return _vaultBalances[msg.sender];
+        uint256 _balance = _vaultBalances[_account];
+        return _balance;
     }
 }

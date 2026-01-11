@@ -1,0 +1,53 @@
+; Phase 3: On-Chain Yield Accrual ⬜ START HERE
+
+; Goal: Make your vault earn yield automatically, every block, without off-chain intervention
+
+; What you need to figure out:
+
+; How do you use block.timestamp or block.number to track time passing?
+; If APY is 500% per year, how do you calculate what percentage accrues per block?
+; Where do you store “the last time we updated yield”?
+; How do you calculate how much yield was earned since the last update?
+; How do you add that yield to the vault’s total assets?
+; What happens to share price when total assets increase from yield?
+; How do you prevent updating yield twice for the same time period?
+; How do you test that yield is actually accruing at the correct rate?
+
+; User Flow:
+
+; User deposits $1000 USDC
+;   ↓
+; Vault stores: lastYieldUpdate = block.timestamp, totalAssets = 1000
+
+; Block 1:
+;   Time passes (1 block)
+;   ↓
+; Any function call triggers yield update
+;   ↓
+; Calculate: yield = (totalAssets * APY * timePassed) / secondsInYear
+;   ↓
+; totalAssets += yield
+;   ↓
+; lastYieldUpdate = current block.timestamp
+;   ↓
+; User's share price is now higher (same shares, more assets)
+
+; User withdraws after 365 days:
+;   ↓
+; Yield updated one final time
+;   ↓
+; User receives: (shares * totalAssets) / totalShares
+;   ↓
+; Gets original $1000 + 365 days of accrued yield
+
+; What you need to do:
+
+; Add a variable to store “when we last updated yield”
+; Add a variable to store the APY (annual percentage yield) as a number
+; Figure out the formula: yearly APY → per-block percentage
+; Create an internal function that calculates and applies yield
+; Call this function at the start of deposit/withdraw/view functions
+; Verify that calling the function multiple times in same block doesn’t double-accrue
+; Write tests simulating blocks passing and verify yield accumulates correctly
+; Test that after 365 blocks, yield matches expected APY
+; Test that multiple users get proportional yield based on share ownership

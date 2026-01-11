@@ -517,6 +517,15 @@ describe("Vaults work properly and distribute good amount to users", async funct
       hash: depositHashv2,
     });
 
+    const balance = await publicCLient.readContract({
+      address: vault.address,
+      abi: vault.abi,
+      functionName: "getDepositBalance",
+      args: [walletClient.account.address],
+    });
+
+    console.log("vault baance for my wallet :", balance);
+
     //simulate withdraw after 1 year update
 
     await vault.simulate._withdrawAll();
@@ -529,7 +538,7 @@ describe("Vaults work properly and distribute good amount to users", async funct
 
     //theres a bug in withdraw not enough balance when we indeed have a balance fix niggalock in fix tm
     //fiinish the rest of the sophisticated test tm possibly
-  } catch (error) {
+  } catch (error: any) {
     console.log(error);
   }
 });
