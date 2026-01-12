@@ -1,0 +1,94 @@
+### The Core Concept: Fixed-Point Arithmetic
+
+Solidity **does not have floating-point numbers** (like `3.14` or `0.5`). All calculations are done with integers (`uint256`).
+
+To work with decimals, we use **fixed-point arithmetic**. We simulate decimals by storing numbers as large integers that have been multiplied by a scaling factor. The most common scaling factor is **10^18**.
+
+**Your number (example):** `0.00000190259`
+**Scaling factor:** `10^18`
+**Integer representation in Solidity:** `0.00000190259 * 10^18` = `190259000000`
+
+You store and perform all math on this integer value.
+
+---
+
+### Arithmetic Rules
+
+Let's define `SCALE = 10**18`. Imagine you have two numbers, `a` and `b`, already scaled.
+
+#### Addition & Subtraction
+
+These are simple. The scale doesn't change.
+
+```solidity
+uint256 scaled_a = 1 * SCALE; // Represents 1.0
+uint256 scaled_b = 2 * SCALE; // Represents 2.0
+
+uint256 sum = scaled_a + scaled_b; // Result is 3 * SCALE (represents 3.0)
+```
+
+#### Multiplication
+
+When you multiply two scaled numbers, their scales also get multiplied. To return to the original scale, you must divide by the scaling factor.
+
+-   **Formula:** `(a * b) / SCALE`
+
+```solidity
+uint256 scaled_a = 2 * SCALE; // Represents 2.0
+uint256 scaled_b = 3 * SCALE; // Represents 3.0
+
+// (2 * SCALE) * (3 * SCALE) = 6 * SCALE * SCALE
+// We divide by SCALE to get back to the correct representation.
+uint256 product = (scaled_a * scaled_b) / SCALE; // Result is 6 * SCALE
+```
+
+#### Division
+
+To avoid losing precision with integer division, you must **multiply the numerator by the scale *before*** you divide. This is the most important rule to remember.
+
+-   **Formula:** `(a * SCALE) / b`
+
+```solidity
+uint256 scaled_a = 6 * SCALE; // Represents 6.0
+uint256 scaled_b = 2 * SCALE; // Represents 2.0
+
+// (6 * SCALE) / (2 * SCALE) would be 3, which is wrong. We lost the scale.
+// Instead, we multiply the numerator by SCALE first.
+uint256 quotient = (scaled_a * SCALE) / scaled_b; // Result is 3 * SCALE
+```
+
+---
+
+### Code Example
+
+Here is a simple contract demonstrating the logic.
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+contract SimpleFixedPoint {
+    uint256 private constant SCALE = 10**18;
+
+    // Your number: 0.00000190259
+    uint256 public myValue = 190259000000;
+
+    // We want to multiply myValue by 2.5
+    // 2.5 is represented as 25 * 10**17 or 2.5 * 10**18
+    uint256 public multiplier = 25 * 10**17;
+
+    // The expected result is ~0.00000475647
+    // Which is represented as 475647500000
+    function calculate() public view returns (uint256) {
+        // Use the rule: (a * b) / SCALE
+        uint256 result = (myValue * multiplier) / SCALE;
+        return result;
+    }
+}
+```
+
+### **Most Important Advice**
+
+Doing this manually is risky. It's easy to make mistakes with the order of operations, leading to precision loss or numerical overflow.
+
+For any real application, **use a trusted library**. The industry standard is **OpenZeppelin**. Their `FixedPointMath` library handles all these operations safely for you.
